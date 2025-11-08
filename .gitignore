@@ -1,0 +1,8 @@
+# Ignore training outputs and datasets
+__pycache__/
+*.png
+*.pth
+augmented_train/
+greenery_dataset/
+test_predictions/
+png/
