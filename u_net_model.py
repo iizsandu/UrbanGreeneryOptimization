@@ -119,6 +119,8 @@ class GreeneryDataset(Dataset):
         image = np.nan_to_num(cv2.imread(img_path, cv2.IMREAD_UNCHANGED), nan=0.0)
         mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
 
+        image = image[:, :, :3]
+
         if mask is None:
             raise FileNotFoundError(f"Mask not found for image: {img_path}")
         
@@ -278,7 +280,7 @@ def predict_and_visualize(model, img_path, device, save_path="prediction.png"):
         preds = (torch.sigmoid(logits) > 0.5).squeeze(0).squeeze(0).cpu().numpy().astype(np.uint8)
         
     overlay = np.zeros_like(original_image_vis, dtype=np.uint8)
-    overlay[preds == 1] = [0, 255, 0]
+    overlay[preds == 1] = [255, 255, 255]
     
     overlay_resized = cv2.resize(overlay, (original_image_vis.shape[1], original_image_vis.shape[0]), interpolation=cv2.INTER_NEAREST)
     blended = cv2.addWeighted(original_image_vis, 1, overlay_resized, 0.6, 0)
@@ -325,7 +327,7 @@ if __name__ == '__main__':
         torch.cuda.empty_cache()
 
     print(f"Using device: {DEVICE}")
-    model = UNet(in_channels=4, out_channels=1).to(DEVICE)
+    model = UNet(in_channels=3, out_channels=1).to(DEVICE)
     
     train_img_dir = os.path.join(AUGMENTED_DIR, 'images')
     train_mask_dir = os.path.join(AUGMENTED_DIR, 'masks')
